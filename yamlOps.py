@@ -1,8 +1,7 @@
 import os
 import yaml
-import ruamel.yaml
+from ruamel.yaml import YAML
 import sys
-
 
 
 with open(r"./docker-compose.yml") as yFile:
@@ -40,7 +39,7 @@ def creatingYamlDict():
         "apiVersiion": "apps/v1",
         "kind":"deployment",
         "metadata":{"name":"%s-deployment"%(tempDict["name"],),"labels":{"app":"%s"%(tempDict["name"],)}},
-        "spec":{"selector":{"matchLabels":{"app":"%s"%(tempDict["name"],)}},"template":{"metadata":{"labels":{"app":"%s"%(tempDict["name"],)}},"spec":{"containers":{"- name":tempDict["name"],"image":"%s"%(tempDict["image"],),"ports":{"containerPort":tempDict["ports"]}}}}}
+        "spec":{"selector":{"matchLabels":{"app":"%s"%(tempDict["name"],)}},"template":{"metadata":{"labels":{"app":"%s"%(tempDict["name"],)}},"spec":{"containers":[{"name":tempDict["name"],"image":"%s"%(tempDict["image"],),"ports":[{"containerPort":tempDict["ports"]}]}]}}}
     }
 
     # we made ready yamlDict thus converting dict to yaml will be easy  
@@ -48,17 +47,23 @@ def creatingYamlDict():
     return yamlDict
 
 
+def converting():
+    yamlDict=creatingYamlDict()
 
+    yaml=YAML()
+    yaml.compact(seq_seq=False, seq_map=False)
+    with open(r"./deployment.yaml","w") as file:
+        yaml.dump(yamlDict,file)
+
+"""
 def converting():
     yamlDict=creatingYamlDict() # called prepared to converting yamlDict
 
-    
-
     with open(r"./deployment.yaml","w") as file:
-        newYaml=yaml.safe_dump(yamlDict, file) # dict to yaml converting place
+        newYaml=yaml.safe_dump( yamlDict,file) # dict to yaml converting place
 
     return newYaml
-
+"""
 
 
 converting()

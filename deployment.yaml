@@ -1,9 +1,9 @@
-apiVersiion: apps/v1
-kind: deployment
+apiVersion: apps/v1
+kind: Deployment
 metadata:
+  name: ops-deployment
   labels:
     app: ops
-  name: ops-deployment
 spec:
   selector:
     matchLabels:
@@ -14,7 +14,9 @@ spec:
         app: ops
     spec:
       containers:
-        '- name': ops
+      -
+        name: ops
         image: nginx:1.14
         ports:
+        -
           containerPort: 80
