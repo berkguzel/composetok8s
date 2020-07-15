@@ -1,0 +1,13 @@
+version: "3.3"
+services:
+  nginx:
+    image: nginx:1.14   
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+    - data:/var/log
+
+volumes:
+  data:
+

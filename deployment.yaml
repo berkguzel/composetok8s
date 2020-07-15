@@ -1,0 +1,20 @@
+apiVersiion: apps/v1
+kind: deployment
+metadata:
+  labels:
+    app: ops
+  name: ops-deployment
+spec:
+  selector:
+    matchLabels:
+      app: ops
+  template:
+    metadata:
+      labels:
+        app: ops
+    spec:
+      containers:
+        '- name': ops
+        image: nginx:1.14
+        ports:
+          containerPort: 80
