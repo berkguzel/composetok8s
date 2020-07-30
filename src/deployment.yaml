@@ -1,0 +1,30 @@
+kind: pod
+spec:
+  replicas:
+  template:
+    spec:
+      volumes:
+      -
+        name: data
+      containers:
+      -
+        image: nginx
+        volumeMounts:
+        -
+          mountPath: asd
+          name: data
+        name: ''
+        ports:
+        -
+          containerPort: 80
+    metadata:
+      labels:
+        app: ''
+  selector:
+    matchLabels:
+      app: ''
+apiVersion: apps/v1
+metadata:
+  labels:
+    app: ''
+  name: -pod
