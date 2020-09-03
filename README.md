@@ -1,6 +1,3 @@
-composetok8s
-
-docker-compose file to Kubernetes file converter
 
 /* still on progress */
 
