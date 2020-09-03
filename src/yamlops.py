@@ -1,11 +1,11 @@
+#!/usr/bin/env python3
+#-*-coding: utf-8-*-
+
 import click
 import os
 import sys
 import yaml
-import click
-import fire 
-from ruamel.yaml import YAML
-from collections import OrderedDict
+
 
 
 @click.command()
@@ -15,38 +15,12 @@ from collections import OrderedDict
 @click.option('--selector',type=str,help='name of your selector',default="")
 @click.option('--ports',type=str,help='number of your port',default="")
 @click.option('--replicas',type=str,help='count of your replicas',default="")
-@click.option('--mountPath',type=str,help='mount path of your volume',default="")
 
 
 
-def main(**kwargs):
 
-   
+def main(**kwargs):   
     tempDict=createTempDict()
-
- 
-
-    if kwargs["replicas"]!="":
-        replicas=int(kwargs["replicas"])
-    else:
-        replicas=None
-
-    if kwargs["ports"]!="":
-        tempDict["ports"]=int(kwargs["ports"])
-
-    """
-    if kwargs["mountPath"]!="":
-        mountPath=kwargs[mountPath]
-    else:
-        mountPath=None
-
-    if kwargs["selector"]!="":
-        name=kwargs["selector"]
-    """
-
-    if kwargs["image"]!="":
-        tempDict["image"]=kwargs["image"]
-
 
     if kwargs["kind"]!="":    # we controlled kind field is empty or not
         if (list(kwargs["kind"])[0]=="p"): # We fixed lower inital letters
@@ -67,30 +41,47 @@ def main(**kwargs):
             api="v1" #we use v1 for pods
         else:
             api="apps/v1" #we use apps/v1 for deployments
-    
+ 
+    if kwargs["image"]!="":
+        tempDict["image"]=kwargs["image"]
     
     if kwargs["name"]!="":
         name=kwargs["name"]
+    
+    if kwargs["replicas"]!="" and kind == "Deployment":
+        replicas=int(kwargs["replicas"])
+    else:
+        replicas= None
+
+    if kwargs["ports"]!="":
+        tempDict["ports"]=int(kwargs["ports"])
+
+
+    
+    
 
     try:
         yamlDict={
             "apiVersion":api,
             "kind":kind,     
-            "metadata":{"name":"%s-%s"%(name,kind,),"labels":{"app":"%s"%(name,)}},
-            "spec":{"selector":{"matchLabels":{"app":"%s"%(name,)}},"replicas":replicas,"template":{"metadata":{"labels":{"app":"%s"%(name,)}},"spec":{"containers":[{"name":name,"image":"%s"%(tempDict["image"],),"ports":[{"containerPort":tempDict["ports"]}],"volumeMounts":[{"name":tempDict["volumeName"],"mountPath":"asd"}]}],"volumes":[{"name":tempDict["volumeName"]}]}}},
-        }
-    
+            "metadata":{"labels":{"app":"%s"%(name,)}},
+            "spec":{"selector":{"matchLabels":{"app":"%s"%(name,)}},"replicas":replicas,"template":{"metadata":{"labels":{"app":"%s"%(name,)}},"spec":{"containers":[{"name":name,"image":"%s"%(tempDict["image"],),"ports":[{"containerPort":tempDict["ports"]}],"volumeMounts":[{"name":tempDict["volumeName"],"mountPath":"%s"%(None,)}]}],"volumes":[{"name":tempDict["volumeName"]}]}}},
+        }    
     except NameError:
         click.echo("You are missing define name or kind")
         return None
     
-
+      
+    try:
+        with open(r"./deployment.yaml","w") as file:
+            yaml.safe_dump((yamlDict),file)    
+        click.echo("{}/{} ".format(kind,name))
+    except Exception as err:
+        print(err)
     
-    yaml=YAML()    
-    yaml.compact(seq_seq=False, seq_map=False)
-    with open(r"./deployment.yaml","w") as file:
-        yaml.dump(yamlDict,file)
-    click.echo("{}/{} ".format(kind,name))
+
+
+
 
 
 def createTempDict():
@@ -107,7 +98,7 @@ def createTempDict():
 
         try:
             index=list(dcFile["services"]).index(image)
-        except ValueError as err:
+        except Exception:
             image=click.prompt("Please enter your service name correctly")
             index=list(dcFile["services"]).index(image)
 
