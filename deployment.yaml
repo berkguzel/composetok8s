@@ -1,21 +1,21 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: Pod
 metadata:
   labels:
-    app: BesiktasJK
+    app: asd
 spec:
-  replicas: 2
+  replicas: null
   selector:
     matchLabels:
-      app: BesiktasJK
+      app: asd
   template:
     metadata:
       labels:
-        app: BesiktasJK
+        app: asd
     spec:
       containers:
       - image: nginx
-        name: BesiktasJK
+        name: asd
         ports:
         - containerPort: 80
         volumeMounts:

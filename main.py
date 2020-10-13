@@ -1,62 +1,56 @@
 #!/usr/bin/env python3
-#-*-coding: utf-8-*-
 
-import click
+import argparse
 import os
 import sys
 import yaml
 
-
-
-@click.command()
-@click.option('--name',type=str,help='name of your app',default="")
-@click.option('--kind',type=str,help='Kind or Deployment',default="")
-@click.option('--image',type=str,help='title of your image',default="")
-@click.option('--selector',type=str,help='name of your selector',default="")
-@click.option('--ports',type=str,help='number of your port',default="")
-@click.option('--replicas',type=str,help='count of your replicas',default="")
-
-
-
-
-def main(**kwargs):   
+def main():
+    parser=argparse.ArgumentParser()
+    parser.add_argument('-n', '--name', help='name of your app', required=True, type=str)
+    parser.add_argument('-k', '--kind', help='kind of your yaml file', required=True, type=str)
+    parser.add_argument('-i', '--image', help='image you want to use', type=str)
+    parser.add_argument('-s', '--selector', help='name of your selector', type=str)
+    parser.add_argument('-p', '--port', help='number of your port', type=str)
+    parser.add_argument('-r', '--replicas', help='count of your replicas', type=str)
+    args=parser.parse_args()
+   
     tempDict=createTempDict()
 
-    if kwargs["kind"]!="":    # we controlled kind field is empty or not
-        if (list(kwargs["kind"])[0]=="p"): # We fixed lower inital letters
-            kind=kwargs["kind"]
+
+    if args.kind:    # we controlled kind field is empty or not
+        if (list(args.kind)[0]=="p"): # We fixed lower inital letters
+            kind=args.kind
             kind=kind.replace("p","P")
-        else:
-            kind=kwargs["kind"]
-    
-    
-        if (list(kwargs["kind"])[0]=="d"):
-            kind=kwargs["kind"]             # We fixed lower inital letters
-            kind=kind.replace("d","D")
-        else:
-            kind=kwargs["kind"]
-    
-    
-        if kwargs["kind"]=="Pod":
             api="v1" #we use v1 for pods
         else:
+            kind=args.kind
+            api="v1" #we use v1 for pods
+    
+    
+        if (list(args.kind)[0]=="d"):
+            kind=args.kind   # We fixed lower inital letters
+            kind=kind.replace("d","D")
             api="apps/v1" #we use apps/v1 for deployments
  
-    if kwargs["image"]!="":
-        tempDict["image"]=kwargs["image"]
+        else:
+            kind=args.kind
+            api="apps/v1" #we use apps/v1 for deployments
+ 
+ 
+    if args.image:
+        tempDict["image"]=args.image
     
-    if kwargs["name"]!="":
-        name=kwargs["name"]
+    if args.name:
+        name=args.name
     
-    if kwargs["replicas"]!="" and kind == "Deployment":
+    if args.replicas and kind == "Deployment":
         replicas=int(kwargs["replicas"])
     else:
         replicas= None
 
-    if kwargs["ports"]!="":
-        tempDict["ports"]=int(kwargs["ports"])
-
-
+    if args.port:
+        tempDict["ports"]=int(args.port)
     
     
 
@@ -75,16 +69,25 @@ def main(**kwargs):
     try:
         with open(r"./deployment.yaml","w") as file:
             yaml.safe_dump((yamlDict),file)    
-        click.echo("{}/{} ".format(kind,name))
+        print("{}/{} ".format(kind,name))
+        
     except Exception as err:
         print(err)
     
+    try:
+        file=open("deployment.yaml","r")
+        print(file.read())
+        
+    except Exception as err:
+        print(err)
 
 
 
 
 
 def createTempDict():
+    titles=''
+    index=0
     with open(r"./docker-compose.yml") as yFile:
         dcFile=yaml.full_load(yFile) # we read yaml file in dict type
     
@@ -94,12 +97,12 @@ def createTempDict():
 
         for item in list(dcFile["services"]):
             print(item )
-        image=click.prompt("You have {} services in your docker-compose.yaml file, please choose a service".format(len(list(dcFile["services"]))))
+        image=input("You have {} services in your docker-compose.yaml file, please choose a service".format(len(list(dcFile["services"]))))
 
         try:
             index=list(dcFile["services"]).index(image)
         except Exception:
-            image=click.prompt("Please enter your service name correctly")
+            image=input("Please enter your service name correctly")
             index=list(dcFile["services"]).index(image)
 
 
@@ -111,9 +114,12 @@ def createTempDict():
     #firstItem1=list(dcFile["services"])[1] # first services name from docker-compose
     titles=list(dcFile["services"][firstItem])#we will hold subtitles below of big title
     #these both variables will help us to access data we need rapidly on dcFile 
- 
+    
+    
 
     tempDict={}
+
+    
    
     for item in titles: # it gets values of titles
         value=str(dcFile["services"][firstItem][item])
