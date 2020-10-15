@@ -17,7 +17,6 @@ def main():
    
     tempDict=createTempDict()
 
-
     if args.kind:    # we controlled kind field is empty or not
         if (list(args.kind)[0]=="p"): # We fixed lower inital letters
             kind=args.kind
@@ -69,7 +68,7 @@ def main():
     try:
         with open(r"./deployment.yaml","w") as file:
             yaml.safe_dump((yamlDict),file)    
-        print("{}/{} ".format(kind,name))
+        print("{}/{} yaml file created. ".format(kind,name))
         
     except Exception as err:
         print(err)
@@ -80,8 +79,6 @@ def main():
         
     except Exception as err:
         print(err)
-
-
 
 
 
@@ -97,7 +94,7 @@ def createTempDict():
 
         for item in list(dcFile["services"]):
             print(item )
-        image=input("You have {} services in your docker-compose.yaml file, please choose a service".format(len(list(dcFile["services"]))))
+        image=input("You have {} services in your docker-compose.yaml file, please choose a service: ".format(len(list(dcFile["services"]))))
 
         try:
             index=list(dcFile["services"]).index(image)
@@ -114,13 +111,9 @@ def createTempDict():
     #firstItem1=list(dcFile["services"])[1] # first services name from docker-compose
     titles=list(dcFile["services"][firstItem])#we will hold subtitles below of big title
     #these both variables will help us to access data we need rapidly on dcFile 
-    
-    
 
     tempDict={}
 
-    
-   
     for item in titles: # it gets values of titles
         value=str(dcFile["services"][firstItem][item])
         tempDict[item]=value # created tempDict to use data more efficiently
