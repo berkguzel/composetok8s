@@ -2,20 +2,20 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: composetok8s
+    app: hasic
 spec:
   replicas: null
   selector:
     matchLabels:
-      app: composetok8s
+      app: hasic
   template:
     metadata:
       labels:
-        app: composetok8s
+        app: hasic
     spec:
       containers:
       - image: nginx
-        name: composetok8s
+        name: hasic
         ports:
         - containerPort: 80
         volumeMounts:

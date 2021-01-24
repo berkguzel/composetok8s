@@ -44,7 +44,7 @@ def main():
         name=args.name
     
     if args.replicas and kind == "Deployment":
-        replicas=int(kwargs["replicas"])
+        replicas=int(args.replicas)
     else:
         replicas= None
 
@@ -61,7 +61,7 @@ def main():
             "spec":{"selector":{"matchLabels":{"app":"%s"%(name,)}},"replicas":replicas,"template":{"metadata":{"labels":{"app":"%s"%(name,)}},"spec":{"containers":[{"name":name,"image":"%s"%(tempDict["image"],),"ports":[{"containerPort":tempDict["ports"]}],"volumeMounts":[{"name":tempDict["volumeName"],"mountPath":"%s"%(None,)}]}],"volumes":[{"name":tempDict["volumeName"]}]}}},
         }    
     except NameError:
-        click.echo("You are missing define name or kind")
+        print("You are missing define name or kind")
         return None
     
       
